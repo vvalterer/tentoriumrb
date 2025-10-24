@@ -1,0 +1,149 @@
+{% extends "content/base_new.html" %}
+
+{% block title %}Каталог товаров - ТенториумРБ{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'homepage' %}">Главная</a></li>
+      <li class="breadcrumb-item active">Каталог товаров</li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-3 col-md-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>&#127991;&#65039; Категории</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            <a href="{% url 'products_list' %}" class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+              Все товары
+            </a>
+            {% for category in categories %}
+            <a href="{% url 'category_products' category.id %}" 
+               class="list-group-item list-group-item-action {% if current_category == category.id|stringformat:'s' %}active{% endif %}">
+              {{ category.name }}
+              <span class="badge bg-secondary">{{ category.products.count }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="col-lg-9 col-md-8">
+      <!-- Search Results Info -->
+      {% if search_query %}
+      <div class="alert alert-info">
+        <h6 class="mb-1">&#128269; Результаты поиска: "{{ search_query }}"</h6>
+        <p class="mb-0">Найдено товаров: {{ products.count }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Products Header -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+              <h4 class="mb-1">Каталог товаров</h4>
+              <p class="text-muted mb-0">Найдено: {{ products.count }} товар{{ products.count|pluralize:"ов,а,ов" }}</p>
+            </div>
+            
+            <div class="d-flex gap-3">
+              <!-- Sort Options -->
+              <select class="form-select" id="sortSelect" onchange="applySorting()">
+                <option value="order" {% if sort_by == 'order' %}selected{% endif %}>По умолчанию</option>
+                <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Цена: по возрастанию</option>
+                <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Цена: по убыванию</option>
+                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>По алфавиту</option>
+                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Сначала новые</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-container">
+        {% if products %}
+        <div class="row">
+          {% for product in products %}
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="product-card">
+              {% if product.is_new %}
+                <span class="badge bg-success">Новинка</span>
+              {% elif product.is_bestseller %}
+                <span class="badge bg-warning">Хит</span>
+              {% elif product.is_featured %}
+                <span class="badge bg-primary">Топ</span>
+              {% endif %}
+              
+              <div class="product-image">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                {% else %}
+                  <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                    <span style="font-size: 4rem;">&#127855;</span>
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="p-4">
+                <h5 class="product-title">
+                  <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
+                    {{ product.name }}
+                  </a>
+                </h5>
+                <p class="text-muted small mb-3">{{ product.short_description|truncatewords:15 }}</p>
+                
+                <div class="price-section">
+                  <span class="current-price">{{ product.price }} &#8381;</span>
+                  {% if product.old_price and product.get_discount_percent > 0 %}
+                    <span class="old-price">{{ product.old_price }} &#8381;</span>
+                    <span class="discount-badge">-{{ product.get_discount_percent }}%</span>
+                  {% endif %}
+                </div>
+                
+                <div class="d-grid gap-2">
+                  <button class="buy-btn" onclick="buyProduct({{ product.id }})">
+                    &#128722; Купить
+                  </button>
+                  <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-secondary">
+                    Подробнее
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+          <div style="font-size: 4rem; margin-bottom: 20px;">&#128230;</div>
+          <h4>Товары не найдены</h4>
+          <p class="text-muted">Попробуйте изменить параметры фильтрации или поискать что-то другое.</p>
+          <a href="{% url 'products_list' %}" class="btn btn-primary">Посмотреть все товары</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Sorting
+function applySorting() {
+    const sortBy = document.getElementById('sortSelect').value;
+    const currentUrl = new URL(window.location);
+    currentUrl.searchParams.set('sort', sortBy);
+    window.location = currentUrl;
+}
+</script>
+
+{% endblock %}

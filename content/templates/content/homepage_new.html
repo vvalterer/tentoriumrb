@@ -1,0 +1,396 @@
+{% extends "content/base_new.html" %}
+
+{% block title %}{{ site_settings.site_title }} - Продукты пчеловодства{% endblock %}
+
+{% block extra_css %}
+<style>
+  .hero-section {
+    background: linear-gradient(135deg, #f8c471, #f7dc6f);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden; /* общий контейнер не даёт выйти слоям */
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><radialGradient id="a" cx="50%" cy="0%" r="50%"><stop offset="0%" stop-color="%23f8c471" stop-opacity="0.1"/><stop offset="100%" stop-color="%23f8c471" stop-opacity="0"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23a)"/></svg>');
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* ВАЖНО: порядок слоёв — левая колонка выше правой */
+  .hero-section .hero-left  { position: relative; z-index: 2; }
+  .hero-section .hero-right { position: relative; z-index: 1; overflow: hidden; }
+
+  /* Ограничим карусель внутри правой колонки */
+  .hero-section .hero-right #heroCarousel { position: relative; }
+  .hero-section .hero-right .carousel-inner,
+  .hero-section .hero-right .carousel-item,
+  .hero-section .hero-right .carousel-item img {
+    border-radius: 16px;
+  }
+
+  .stats-counter {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  }
+
+  .stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #f4d03f;
+    display: block;
+  }
+
+  .category-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    height: 100%;
+  }
+
+  .category-card:hover {
+    border-color: #f4d03f;
+    transform: translateY(-5px);
+  }
+
+  .category-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #f8c471, #f7dc6f);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+  }
+
+  .section-title {
+    position: relative;
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(135deg, #f8c471, #f7dc6f);
+    border-radius: 2px;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin: 50px 0;
+  }
+
+  .benefit-item { text-align: center; padding: 30px; }
+
+  .benefit-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #f8c471, #f7dc6f);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 1.8rem;
+    color: #333;
+  }
+
+  /* Плавная прокрутка для якорей */
+  html { scroll-behavior: smooth; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section">
+  {% autoescape off %}
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 hero-left">
+        <h1 class="display-4 fw-bold mb-4">&#127855; ТенториумРБ</h1>
+        <p class="lead mb-4">
+          Натуральные продукты пчеловодства для здоровья и красоты. Проверенное качество,
+          доставка по всем регионам России, Казахстана и Беларуси.
+        </p>
+        <div class="d-flex gap-3">
+          <a href="/products/" class="btn btn-dark btn-lg px-4">Смотреть каталог</a>
+          <a href="#categories" class="btn btn-outline-dark btn-lg px-4">О продукции</a>
+        </div>
+      </div>
+
+      <div class="col-lg-6 hero-right">
+        {% if banners %}
+          <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for banner in banners %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                {% if banner.image %}
+                  <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}" style="height: 400px; object-fit: cover;">
+                {% else %}
+                  <div class="d-flex align-items-center justify-content-center bg-light" style="height: 400px; border-radius:16px;">
+                    <span style="font-size: 5rem;">&#127855;</span>
+                  </div>
+                {% endif %}
+                <div class="carousel-caption">
+                  <h5>{{ banner.title }}</h5>
+                  {% if banner.subtitle %}<p>{{ banner.subtitle }}</p>{% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Предыдущий">
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Следующий">
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          </div>
+        {% else %}
+          <div class="d-flex align-items-center justify-content-center bg-light rounded-4" style="height: 400px;">
+            <div class="text-center">
+              <span style="font-size: 8rem;">&#127855;</span>
+              <h3>Продукты пчеловодства</h3>
+              <p class="text-muted">Натуральные, полезные, проверенные</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endautoescape %}
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3 mb-4">
+        <div class="stats-counter">
+          <span class="stats-number">{{ categories|length }}+</span>
+          <p class="mb-0">Категорий товаров</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4">
+        <div class="stats-counter">
+          <span class="stats-number">1000+</span>
+          <p class="mb-0">Довольных клиентов</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4">
+        <div class="stats-counter">
+          <span class="stats-number">35+</span>
+          <p class="mb-0">Лет на рынке</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-4">
+        <div class="stats-counter">
+          <span class="stats-number">24/7</span>
+          <p class="mb-0">Поддержка</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5" id="categories">
+  <div class="container">
+    <h2 class="section-title">&#128029; Категории продукции</h2>
+    <div class="row">
+      {% for category in categories %}
+      <div class="col-lg-3 col-md-6 mb-4">
+        <a href="{% url 'category_products' category.id %}" class="text-decoration-none">
+          <div class="category-card">
+            <div class="category-icon">
+              {% if category.image %}
+                <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width: 50px; height: 50px; border-radius: 50%;">
+              {% else %}
+                &#127855;
+              {% endif %}
+            </div>
+            <h5 class="mb-3">{{ category.name }}</h5>
+            <p class="text-muted small">{{ category.products_count }} товаров</p>
+            {% if category.description %}
+              <p class="text-muted small">{{ category.description|truncatewords:10 }}</p>
+            {% endif %}
+          </div>
+        </a>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center">
+        <p class="text-muted">Категории пока не добавлены. Зайдите в админку для создания категорий.</p>
+        <a href="/admin/" class="btn btn-primary">Перейти в админку</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products -->
+{% if featured_products %}
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="section-title">&#11088; Рекомендуемые товары</h2>
+    <div class="row">
+      {% for product in featured_products %}
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="product-card">
+          {% if product.is_new %}
+            <span class="badge bg-success">Новинка</span>
+          {% elif product.is_bestseller %}
+            <span class="badge bg-warning">Хит</span>
+          {% endif %}
+
+          <div class="product-image">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+              <div class="d-flex align-items-center justify-content-center h-100">
+                <span style="font-size: 4rem;">&#127855;</span>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="p-4">
+            <h5 class="mb-2">{{ product.name }}</h5>
+            <p class="text-muted small mb-3">{{ product.short_description|truncatewords:15 }}</p>
+
+            <div class="price-section">
+              <span class="current-price">{{ product.price }} &#8381;</span>
+              {% if product.old_price and product.get_discount_percent > 0 %}
+                <span class="old-price">{{ product.old_price }} &#8381;</span>
+                <span class="discount-badge">-{{ product.get_discount_percent }}%</span>
+              {% endif %}
+            </div>
+
+            <div class="d-grid gap-2">
+              <button class="buy-btn" onclick="buyProduct({{ product.id }})">
+                &#128722; Купить сейчас
+              </button>
+              <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-secondary">
+                Подробнее
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Bestsellers -->
+{% if bestseller_products %}
+<section class="py-5">
+  <div class="container">
+    <h2 class="section-title">&#128293; Хиты продаж</h2>
+    <div class="row">
+      {% for product in bestseller_products %}
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="product-card">
+          <span class="badge bg-warning">Хит продаж</span>
+
+          <div class="product-image">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+              <div class="d-flex align-items-center justify-content-center h-100">
+                <span style="font-size: 4rem;">&#127855;</span>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="p-4">
+            <h5 class="mb-2">{{ product.name }}</h5>
+            <p class="text-muted small mb-3">{{ product.short_description|truncatewords:15 }}</p>
+
+            <div class="price-section">
+              <span class="current-price">{{ product.price }} &#8381;</span>
+              {% if product.old_price and product.get_discount_percent > 0 %}
+                <span class="old-price">{{ product.old_price }} &#8381;</span>
+                <span class="discount-badge">-{{ product.get_discount_percent }}%</span>
+              {% endif %}
+            </div>
+
+            <div class="d-grid gap-2">
+              <button class="buy-btn" onclick="buyProduct({{ product.id }})">
+                &#128722; Купить сейчас
+              </button>
+              <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-secondary">
+                Подробнее
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Benefits Section -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="section-title">&#127775; Почему выбирают продукцию Тенториум</h2>
+    <div class="benefits-grid">
+      <div class="benefit-item">
+        <div class="benefit-icon">&#9989;</div>
+        <h5>100% Натурально</h5>
+        <p class="text-muted">Только натуральные продукты пчеловодства без химических добавок</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">&#128666;</div>
+        <h5>Быстрая доставка</h5>
+        <p class="text-muted">Доставка заказов осуществляется по всем регионам России, Казахстана и Беларуси</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">&#128179;</div>
+        <h5>Безопасная оплата</h5>
+        <p class="text-muted">Защищенные платежи и гарантия возврата средств</p>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">&#127919;</div>
+        <h5>Качество</h5>
+        <p class="text-muted">Собственное производство и контроль качества на всех этапах</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <div class="container text-center text-white">
+    <h2 class="mb-4">Готовы попробовать натуральные продукты?</h2>
+    <p class="lead mb-4">Присоединяйтесь к тысячам довольных клиентов</p>
+    <a href="/products/" class="btn btn-warning btn-lg px-5">Смотреть весь каталог</a>
+  </div>
+</section>
+
+{% endblock %}

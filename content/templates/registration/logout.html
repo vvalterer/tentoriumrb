@@ -1,0 +1,10 @@
+{% extends "content/base.html" %}
+
+{% block title %}Вы вышли из аккаунта{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h2>Вы вышли из аккаунта</h2>
+    <p><a href="{% url 'login' %}" class="btn btn-primary mt-3">Войти снова</a></p>
+</div>
+{% endblock %}

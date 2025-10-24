@@ -1,0 +1,199 @@
+{% extends "content/base_new.html" %}
+
+{% block title %}{{ article.title }} - {{ site_settings.site_title }}{% endblock %}
+{% block meta_description %}{{ article.content|striptags|truncatewords:30 }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .article-header{background:linear-gradient(135deg,#f8c471,#f7dc6f);padding:60px 0;margin-bottom:50px}
+  .article-container{max-width:800px;margin:0 auto}
+  .article-content{background:#fff;padding:40px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.1);line-height:1.8;font-size:1.1rem}
+  .article-content h1,.article-content h2,.article-content h3{color:#2c3e50;margin:30px 0 20px}
+  .article-content p{margin-bottom:20px;color:#495057}
+  .article-meta{background:#f8f9fa;padding:20px;border-radius:15px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  .meta-item{display:flex;align-items:center;gap:8px;color:#6c757d;font-size:.95rem}
+  .back-btn{background:linear-gradient(135deg,#6c757d,#495057);border:none;color:#fff;padding:12px 25px;border-radius:25px;font-weight:600;text-decoration:none;transition:.3s;display:inline-block;margin-bottom:30px}
+  .back-btn:hover{background:linear-gradient(135deg,#495057,#6c757d);color:#fff;transform:translateY(-2px);box-shadow:0 5px 15px rgba(108,117,125,.4)}
+  .article-hero{margin-bottom:25px;border-radius:16px;overflow:hidden}
+  .breadcrumbs{font-size:.95rem;color:#6c757d;margin-bottom:15px}
+  .breadcrumbs a{color:#6c757d;text-decoration:none}
+  .tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+  .tag{background:#eef2ff;color:#4f46e5;padding:6px 10px;border-radius:999px;font-size:.85rem;text-decoration:none}
+  .share{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .share a{border:1px solid #e9ecef;border-radius:10px;padding:8px 12px;text-decoration:none;color:#495057}
+  .author-box{display:flex;gap:15px;align-items:center;background:#f8f9fa;border-radius:15px;padding:16px;margin-top:30px}
+  .author-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;background:#e9ecef}
+  .nav-links{display:flex;justify-content:space-between;gap:10px;margin-top:35px}
+  .nav-links a{flex:1;text-decoration:none;border:1px solid #e9ecef;border-radius:12px;padding:12px;background:#fff;color:#495057}
+  .related-articles{background:#f8f9fa;padding:40px 0;margin-top:50px}
+  .cta-section{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:50px 0;margin-top:50px;border-radius:20px;text-align:center;color:#fff}
+  @media (max-width:768px){.article-content{padding:25px;margin:20px}.article-meta{flex-direction:column;align-items:flex-start}}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="article-header">
+  <div class="container">
+    <div class="article-container">
+      <div class="breadcrumbs">
+        <a href="/">Главная</a> &nbsp;/&nbsp; <a href="{% url 'article_list' %}">Статьи</a> &nbsp;/&nbsp; <span>{{ article.title }}</span>
+      </div>
+      <a href="{% url 'article_list' %}" class="back-btn">&#8592; Все статьи</a>
+      <h1 class="display-5 fw-bold text-dark">{{ article.title }}</h1>
+    </div>
+  </div>
+</section>
+
+<section class="pb-5">
+  <div class="container">
+    <div class="article-container">
+
+      <!-- Meta -->
+      <div class="article-meta">
+        <div class="meta-item">
+          <span>&#128197;</span>
+          <span>{{ article.created_at|date:"d F Y" }}</span>
+        </div>
+        <div class="meta-item">
+          <span>&#128065;</span>
+          <span>{{ article.views|default:0 }} просмотров</span>
+        </div>
+        <div class="meta-item">
+          <span>&#128218;</span>
+          {% with wc=article.content|striptags|wordcount %}
+            {% if wc|default:0 == 0 %}
+              <span>Время чтения: ~1 мин</span>
+            {% else %}
+              {% with wc2=wc|add:"199" %}{% widthratio wc2 200 1 as mins %}{% endwith %}
+              <span>Время чтения: ~{{ mins }} мин</span>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+
+      <!-- Hero image -->
+      {% if article.image %}
+        <div class="article-hero">
+          <img src="{{ article.image.url }}" alt="{{ article.title }}" class="img-fluid w-100">
+        </div>
+      {% endif %}
+
+      <!-- Body -->
+      <div class="article-content">
+        {% if article_is_html %}
+          {{ article.content|safe }}
+        {% else %}
+          {{ article.content|linebreaks }}
+        {% endif %}
+
+        <!-- Tags -->
+        {% if article.tags.all %}
+          {% if article.tags.all|length %}
+            <div class="tag-list" aria-label="Теги">
+              {% for tag in article.tags.all %}
+                <a class="tag" href="{% url 'article_list' %}?tag={{ tag.slug|default:tag.id }}">{{ tag.name }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endif %}
+
+        <!-- Share -->
+        <div class="share" aria-label="Поделиться">
+          <a href="https://t.me/share/url?url={{ request.build_absolute_uri|urlencode }}&text={{ article.title|urlencode }}" target="_blank" rel="noopener">Telegram</a>
+          <a href="https://wa.me/?text={{ article.title|urlencode }}%20{{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener">WhatsApp</a>
+          <a href="https://vk.com/share.php?url={{ request.build_absolute_uri|urlencode }}" target="_blank" rel="noopener">VK</a>
+          <a href="#" id="copy-link">Скопировать ссылку</a>
+        </div>
+
+        <!-- Author box -->
+        {% if article.author %}
+        <div class="author-box">
+          {% if article.author.avatar %}
+            <img class="author-avatar" src="{{ article.author.avatar.url }}" alt="{{ article.author.get_full_name|default:article.author.username }}">
+          {% else %}
+            <div class="author-avatar"></div>
+          {% endif %}
+          <div>
+            <div><strong>{{ article.author.get_full_name|default:article.author.username }}</strong></div>
+            {% if article.author.bio %}<div class="text-muted">{{ article.author.bio }}</div>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Prev / Next -->
+        {% if prev_article or next_article %}
+          <div class="nav-links">
+            {% if prev_article %}
+              <a href="{% url 'article_detail' prev_article.pk %}">&#8592; {{ prev_article.title }}</a>
+            {% else %}
+              <span></span>
+            {% endif %}
+            {% if next_article %}
+              <a href="{% url 'article_detail' next_article.pk %}">{{ next_article.title }} &#8594;</a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Related -->
+{% if related_articles %}
+<section class="related-articles">
+  <div class="container">
+    <div class="article-container">
+      <h3 class="mb-4">Похожие статьи</h3>
+      <div class="row g-3">
+        {% for it in related_articles %}
+          <div class="col-12 col-md-6">
+            <a href="{% url 'article_detail' it.pk %}" class="d-block p-3 bg-white rounded-3 text-decoration-none border">
+              <div class="fw-semibold text-dark mb-1">{{ it.title }}</div>
+              <div class="small text-muted">{{ it.created_at|date:"d.m.Y" }}</div>
+              {% if it.short_description %}
+                <div class="mt-2 text-muted">{{ it.short_description|striptags|truncatewords:24 }}</div>
+              {% endif %}
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="pb-5">
+  <div class="container">
+    <div class="article-container">
+      <div class="cta-section">
+        <h3 class="mb-4">Заинтересовались продукцией?</h3>
+        <p class="lead mb-4">Ознакомьтесь с нашим каталогом натуральных продуктов пчеловодства</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+          <a href="{% url 'products_list' %}" class="btn btn-warning btn-lg px-4">Смотреть каталог</a>
+          <a href="{% url 'article_list' %}" class="btn btn-outline-light btn-lg px-4">Другие статьи</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Copy link script -->
+<script>
+  (function(){
+    var btn=document.getElementById('copy-link');
+    if(!btn) return;
+    btn.addEventListener('click',function(e){
+      e.preventDefault();
+      navigator.clipboard.writeText(window.location.href).then(function(){
+        btn.textContent='Ссылка скопирована!';
+        setTimeout(function(){btn.textContent='Скопировать ссылку';},2000);
+      });
+    });
+  })();
+</script>
+
+{% endblock %}

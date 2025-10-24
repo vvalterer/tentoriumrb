@@ -1,0 +1,163 @@
+{% extends "content/base_new.html" %}
+
+{% block title %}Статьи о пчеловодстве - {{ site_settings.site_title }}{% endblock %}
+
+{% block meta_description %}Полезные статьи о продуктах пчеловодства, здоровье и красоте от экспертов ТенториумРБ{% endblock %}
+
+{% block extra_css %}
+<style>
+  .articles-hero {
+    background: linear-gradient(135deg, #f8c471, #f7dc6f);
+    padding: 60px 0;
+    margin-bottom: 50px;
+  }
+  
+  .article-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+    border: none;
+  }
+  
+  .article-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+  
+  .article-image {
+    height: 200px;
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #6c757d;
+  }
+  
+  .article-content {
+    padding: 25px;
+  }
+  
+  .article-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 15px;
+    line-height: 1.4;
+  }
+  
+  .article-excerpt {
+    color: #6c757d;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  
+  .read-more-btn {
+    background: linear-gradient(135deg, #f4d03f, #f8c471);
+    border: none;
+    color: #2c3e50;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .read-more-btn:hover {
+    background: linear-gradient(135deg, #f8c471, #f4d03f);
+    color: #2c3e50;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(244, 208, 63, 0.4);
+  }
+  
+  .article-meta {
+    background: #f8f9fa;
+    padding: 15px 25px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .views-badge {
+    background: #e9ecef;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+  }
+  
+  .no-articles {
+    text-align: center;
+    padding: 80px 20px;
+    color: #6c757d;
+  }
+  
+  .no-articles-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #dee2e6;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="articles-hero">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 fw-bold mb-4">&#128218; Статьи о пчеловодстве</h1>
+        <p class="lead">Полезные материалы о продуктах пчеловодства, их свойствах и применении для здоровья и красоты</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Articles Grid -->
+<section class="pb-5">
+  <div class="container">
+    {% if articles %}
+      <div class="row g-4">
+        {% for article in articles %}
+        <div class="col-lg-6 col-xl-4">
+          <article class="article-card">
+            <div class="article-image">
+              &#128196;
+            </div>
+            <div class="article-content">
+              <h5 class="article-title">{{ article.title }}</h5>
+              <p class="article-excerpt">{{ article.content|truncatewords:25 }}</p>
+              <a href="{% url 'article_detail' article.pk %}" class="read-more-btn">
+                Читать полностью &#8594;
+              </a>
+            </div>
+            <div class="article-meta">
+              <span>{{ article.created_at|date:"d.m.Y" }}</span>
+              <span class="views-badge">
+                &#128065; {{ article.views }} просмотров
+              </span>
+            </div>
+          </article>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-articles">
+        <div class="no-articles-icon">&#128221;</div>
+        <h3>Статьи пока не добавлены</h3>
+        <p class="lead">Скоро здесь появятся интересные материалы о продуктах пчеловодства</p>
+        <a href="{% url 'homepage' %}" class="btn btn-warning btn-lg mt-3">
+          Перейти на главную
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

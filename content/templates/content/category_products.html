@@ -1,0 +1,95 @@
+{% extends "content/base_new.html" %}
+
+{% block title %}{{ category.name }} - ТенториумРБ{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'homepage' %}">Главная</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'products_list' %}">Каталог</a></li>
+      <li class="breadcrumb-item active">{{ category.name }}</li>
+    </ol>
+  </nav>
+
+  <!-- Category Header -->
+  <div class="text-center mb-5">
+    <h1 class="display-4 mb-3">{{ category.name }}</h1>
+    {% if category.description %}
+    <p class="lead text-muted">{{ category.description }}</p>
+    {% endif %}
+    <p class="text-muted">Найдено: {{ products.count }} товар{{ products.count|pluralize:"ов,а,ов" }}</p>
+  </div>
+
+  <!-- Products Grid -->
+  {% if products %}
+  <div class="row">
+    {% for product in products %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="product-card">
+        {% if product.is_new %}
+          <span class="badge bg-success">Новинка</span>
+        {% elif product.is_bestseller %}
+          <span class="badge bg-warning">Хит</span>
+        {% elif product.is_featured %}
+          <span class="badge bg-primary">Топ</span>
+        {% endif %}
+        
+        <div class="product-image">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+          {% else %}
+            <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+              <span style="font-size: 4rem;">&#127855;</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="p-4">
+          <h5 class="mb-2">
+            <a href="{% url 'product_detail' product.id %}" class="text-decoration-none text-dark">
+              {{ product.name }}
+            </a>
+          </h5>
+          <p class="text-muted small mb-3">{{ product.short_description|truncatewords:15 }}</p>
+          
+          <div class="price-section">
+            <span class="current-price">{{ product.price }} &#8381;</span>
+            {% if product.old_price and product.get_discount_percent > 0 %}
+              <span class="old-price">{{ product.old_price }} &#8381;</span>
+              <span class="discount-badge">-{{ product.get_discount_percent }}%</span>
+            {% endif %}
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button class="buy-btn" onclick="buyProduct({{ product.id }})">
+              &#128722; Купить
+            </button>
+            <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-secondary">
+              Подробнее
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <div style="font-size: 4rem; margin-bottom: 20px;">&#128230;</div>
+    <h4>В этой категории пока нет товаров</h4>
+    <p class="text-muted">Попробуйте посмотреть другие категории или вернитесь позже.</p>
+    <a href="{% url 'products_list' %}" class="btn btn-primary">Посмотреть все товары</a>
+  </div>
+  {% endif %}
+
+  <!-- Back to catalog -->
+  <div class="text-center mt-5 mb-5">
+    <a href="{% url 'products_list' %}" class="btn btn-outline-secondary">
+      &#8592; Вернуться в каталог
+    </a>
+  </div>
+</div>
+
+{% endblock %}

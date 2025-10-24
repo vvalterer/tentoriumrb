@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ТенториумРБ - Продукты пчеловодства{% endblock %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block meta_description %}Натуральные продукты пчеловодства от ТенториумРБ. Мед, прополис, перга, маточное молочко с доставкой по России.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}тенториум, продукты пчеловодства, мед, прополис, перга, маточное молочко, здоровье{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #ffd700;
+            --secondary-color: #ff6b35;
+            --success-color: #28a745;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+        }
+        
+        /* Header Styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--dark-color);
+        }
+        
+        .navbar-brand:hover {
+            color: var(--primary-color);
+        }
+        
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+        
+        /* Product Cards */
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .product-image {
+            height: 250px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+        
+        .badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 2;
+        }
+        
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .old-price {
+            font-size: 1rem;
+            text-decoration: line-through;
+            color: #95a5a6;
+        }
+        
+        .discount-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .buy-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .buy-btn:hover {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 50px 0 20px;
+        }
+        
+        .footer h5 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .footer a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .fab:hover {
+            background: linear-gradient(135deg, #128c7e, #25d366);
+            transform: scale(1.1);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .fab {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+      
+        .fab.telegram {
+            background: linear-gradient(135deg, #0088cc, #00bfff);
+        }
+        .fab.telegram:hover {
+            background: linear-gradient(135deg, #00bfff, #0088cc);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'homepage' %}">
+                &#127855; ТенториумРБ
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'homepage' %}">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'products_list' %}">Каталог</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'article_list' %}">Статьи</a>
+                    </li>
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex me-3" action="{% url 'search_products' %}" method="get">
+                    <input type="text" name="q" class="form-control me-2" placeholder="Поиск товаров..." value="{{ request.GET.q }}">
+                    <button type="submit" class="btn btn-outline-warning">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <!-- User Menu -->
+                <div class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'partner_cabinet' %}">Личный кабинет</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/admin/logout/">Выйти</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a class="nav-link" href="/admin/">
+                            <i class="fas fa-sign-in-alt"></i> Админка
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main style="margin-top: 80px;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5>&#127855; ТенториумРБ</h5>
+                    <p class="mb-3">Натуральные продукты пчеловодства высочайшего качества. Тенториум заботится о вашем здоровье уже более 35 лет.</p>
+                </div>
+                
+                <div class="col-lg-2 mb-4">
+                    <h5>Каталог</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'products_list' %}">Все товары</a></li>
+                        <li><a href="https://tentoriumrb.ru/category/1/">Мед</a></li>
+                        <li><a href="https://tentoriumrb.ru/category/2/">Здоровье</a></li>
+                        <li><a href="https://tentoriumrb.ru/category/3/">Красота</a></li>
+                        <li><a href="https://tentoriumrb.ru/category/4/">Мамам</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 mb-4">
+                    <h5>Информация</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'article_list' %}">Статьи</a></li>
+                        <li><a href="#">О компании</a></li>
+                        <li><a href="#">Доставка</a></li>
+                        <li><a href="#">Контакты</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4 mb-4">
+                    <h5>Контакты</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:+79273385408">+7 (927) 338-54-08</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:info@tentoriumrb.ru">info@tentoriumrb.ru</a>
+                        </li>
+                        <li>
+                            <i class="fas fa-clock"></i>
+                            Работаем 24/7
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 ТенториумРБ. Все права защищены.</p>
+                </div>
+                
+                <div class="col-md-6 text-md-end">
+                    <a href="{% url 'privacy_policy' %}" class="me-3">Политика конфиденциальности</a>
+                    <a href="{% url 'terms_conditions' %}">Пользовательское соглашение</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/79273385408" class="fab" target="_blank" title="Написать в WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Floating Telegram Button -->
+    <a href="https://t.me/Tent2024Bot" class="fab" target="_blank" title="Перейти в Telegram">
+        <i class="fab fa-telegram-plane"></i>
+    </a>
+    
+    <!-- Cookie Notice -->
+    <div id="cookie-notice" class="cookie-banner">
+        <div class="cookie-content">
+            <span class="cookie-text">
+                Этот сайт использует файлы cookie для улучшения работы. 
+                Продолжая использование сайта, вы соглашаетесь с этим.
+            </span>
+            <a href="{% url 'privacy_policy' %}" class="cookie-link">Подробнее в политике конфиденциальности</a>
+            <button id="cookie-accept" class="cookie-button">Понятно</button>
+        </div>
+    </div>
+  
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Buying function
+        async function buyProduct(productId) {
+            try {
+                const response = await fetch(`/product/${productId}/click/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success && data.redirect_url) {
+                    window.open(data.redirect_url, '_blank');
+                }
+            } catch (error) {
+                console.error('Ошибка при отправке клика:', error);
+            }
+        }
+
+        // Cookie Notice Script
+        (function() {
+            'use strict';
+            
+            function checkCookieConsent() {
+                if (!localStorage.getItem('cookieConsent')) {
+                    showCookieNotice();
+                }
+            }
+            
+            function showCookieNotice() {
+                var notice = document.getElementById('cookie-notice');
+                if (notice) {
+                    notice.classList.add('show');
+                    notice.style.display = 'block';
+                }
+            }
+            
+            function hideCookieNotice() {
+                var notice = document.getElementById('cookie-notice');
+                if (notice) {
+                    notice.style.animation = 'slideDown 0.3s ease-in';
+                    setTimeout(function() {
+                        notice.style.display = 'none';
+                    }, 300);
+                }
+            }
+            
+            function acceptCookies() {
+                localStorage.setItem('cookieConsent', 'true');
+                localStorage.setItem('cookieConsentDate', new Date().toISOString());
+                hideCookieNotice();
+            }
+            
+            function initCookieNotice() {
+                checkCookieConsent();
+                
+                var acceptButton = document.getElementById('cookie-accept');
+                if (acceptButton) {
+                    acceptButton.addEventListener('click', acceptCookies);
+                }
+                
+                setTimeout(function() {
+                    if (!localStorage.getItem('cookieConsent')) {
+                        acceptCookies();
+                    }
+                }, 30000);
+            }
+            
+            var style = document.createElement('style');
+            style.textContent = `
+                .cookie-banner {
+                    display: none;
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    background: rgba(33, 37, 41, 0.95);
+                    color: #fff;
+                    padding: 15px 20px;
+                    z-index: 9999;
+                    border-top: 3px solid #ffd700;
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+                }
+
+                .cookie-content {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                }
+
+                .cookie-text {
+                    font-size: 14px;
+                    line-height: 1.4;
+                    flex: 1;
+                    min-width: 200px;
+                }
+
+                .cookie-link {
+                    color: #ffd700;
+                    text-decoration: underline;
+                    font-size: 14px;
+                    transition: color 0.3s ease;
+                }
+
+                .cookie-link:hover {
+                    color: #ffed4e;
+                    text-decoration: underline;
+                }
+
+                .cookie-button {
+                    background: #ffd700;
+                    color: #212529;
+                    border: none;
+                    padding: 8px 20px;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    min-width: 100px;
+                }
+
+                .cookie-button:hover {
+                    background: #ffed4e;
+                    transform: translateY(-1px);
+                }
+
+                @media (max-width: 768px) {
+                    .cookie-content {
+                        flex-direction: column;
+                        text-align: center;
+                    }
+                    
+                    .cookie-text {
+                        font-size: 13px;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .cookie-banner {
+                        padding: 12px 15px;
+                    }
+                }
+
+                .cookie-banner.show {
+                    display: block;
+                    animation: slideUp 0.4s ease-out;
+                }
+
+                @keyframes slideUp {
+                    from {
+                        transform: translateY(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes slideDown {
+                    from {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateY(100%);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initCookieNotice);
+            } else {
+                initCookieNotice();
+            }
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>
