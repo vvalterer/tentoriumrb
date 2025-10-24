@@ -1,0 +1,23 @@
+# Django LTS для Python 3.6
+Django==3.2.25
+asgiref==3.5.2
+sqlparse==0.4.4
+pytz==2024.1
+
+# env и база
+python-decouple==3.6
+dj-database-url==0.5.0
+psycopg2-binary==2.8.6   # если Postgres
+
+# статика/картинки
+Pillow==8.4.0
+
+# утилиты (оставь, если нужны)
+requests==2.27.1
+redis==3.5.3
+
+# DRF (если используешь API)
+djangorestframework==3.13.1
+
+# JSONField backport (если НЕ Postgres JSONField или нужна совместимость)
+django-jsonfield-backport==1.0.5
